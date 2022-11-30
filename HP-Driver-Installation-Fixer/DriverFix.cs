@@ -28,8 +28,23 @@ namespace HP_Driver_Installation_Fixer
                     {
                         foreach (string subDir in subDirs)
                         {
+                            string detectionCmd = Path.Combine(subDir, "detection.cmd");
                             string installCmd = Path.Combine(subDir, "install.cmd");
-                            if (File.Exists(installCmd))
+
+                            if (File.Exists(detectionCmd))
+                            {
+                                streamReader = new StreamReader(detectionCmd);
+                                string streamContents = streamReader.ReadToEnd();
+
+                                if (streamContents.Contains("goto unsupport_OS"))
+                                {
+                                    patchList.Add(subDir);
+                                }
+
+                                streamReader.Close();
+                                Thread.Sleep(50);
+                            }
+                            else if (File.Exists(installCmd))
                             {
                                 streamReader = new StreamReader(installCmd);
                                 string streamContents = streamReader.ReadToEnd();
@@ -80,16 +95,35 @@ namespace HP_Driver_Installation_Fixer
 
                     foreach (string patchDir in patchList)
                     {
+                        string detectionCmd = Path.Combine(patchDir, "detection.cmd");
                         string installCmd = Path.Combine(patchDir, "install.cmd");
-                        if (File.Exists(installCmd))
+
+                        if (File.Exists(detectionCmd) || File.Exists(installCmd))
                         {
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 1, patchDir)));
-                            streamReader = new StreamReader(installCmd);
-                            string streamContents = streamReader.ReadToEnd();
-                            streamReader.Close();
-                            Thread.Sleep(50);
 
-                            File.WriteAllText(installCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                            if (File.Exists(detectionCmd))
+                            {
+                                streamReader = new StreamReader(detectionCmd);
+                                string streamContents = streamReader.ReadToEnd();
+                                streamReader.Close();
+                                Thread.Sleep(50);
+
+                                File.WriteAllText(detectionCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                            }
+
+                            Thread.Sleep(500);
+
+                            if (File.Exists(installCmd))
+                            {
+                                streamReader = new StreamReader(installCmd);
+                                string streamContents = streamReader.ReadToEnd();
+                                streamReader.Close();
+                                Thread.Sleep(50);
+
+                                File.WriteAllText(installCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                            }
+
                             Thread.Sleep(500);
 
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 2, patchDir)));
