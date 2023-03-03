@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
-// Copyright (c) 2022 Josh Davidson
+// Copyright (c) 2022-2023 Josh Davidson
 
 namespace HP_Driver_Installation_Fixer
 {
