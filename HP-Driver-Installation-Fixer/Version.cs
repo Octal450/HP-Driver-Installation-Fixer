@@ -2,7 +2,7 @@
 {
     public static class Version
     {
-        public const string VerMain = "1.0.2";
-        public const string VerAssembly = "1.0.2.0";
+        public const string VerMain = "1.0.3";
+        public const string VerAssembly = "1.0.3.0";
     }
 }

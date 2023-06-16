@@ -113,11 +113,15 @@ namespace HP_Driver_Installation_Fixer
                         string installBat = Path.Combine(patchDir, "install.bat");
                         string installCmd = Path.Combine(patchDir, "install.cmd");
 
-                        if (File.Exists(detectionCmd) || File.Exists(installBat) || File.Exists(installCmd))
+                        bool detectionCmdExists = File.Exists(detectionCmd);
+                        bool installBatExists = File.Exists(installBat);
+                        bool installCmdExists = File.Exists(installCmd);
+
+                        if (detectionCmdExists || installBatExists || installCmdExists)
                         {
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 1, patchDir)));
 
-                            if (File.Exists(detectionCmd))
+                            if (detectionCmdExists)
                             {
                                 streamReader = new StreamReader(detectionCmd);
                                 string streamContents = streamReader.ReadToEnd();
@@ -129,7 +133,7 @@ namespace HP_Driver_Installation_Fixer
 
                             Thread.Sleep(500);
 
-                            if (File.Exists(installBat))
+                            if (installBatExists)
                             {
                                 streamReader = new StreamReader(installBat);
                                 string streamContents = streamReader.ReadToEnd();
@@ -141,7 +145,7 @@ namespace HP_Driver_Installation_Fixer
 
                             Thread.Sleep(500);
 
-                            if (File.Exists(installCmd))
+                            if (installCmdExists)
                             {
                                 streamReader = new StreamReader(installCmd);
                                 string streamContents = streamReader.ReadToEnd();
@@ -184,7 +188,7 @@ namespace HP_Driver_Installation_Fixer
                         }
                         else // This will only happen if the user/system deleted something before we got here, but after we searched
                         {
-                            MessageBox.Show("Could not patch " + patchDir + " because install.cmd was found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Could not patch " + patchDir + " because detection.cmd, install.bat, or install.cmd was found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
 
