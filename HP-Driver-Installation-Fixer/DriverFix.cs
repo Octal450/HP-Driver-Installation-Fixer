@@ -159,12 +159,24 @@ namespace HP_Driver_Installation_Fixer
 
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 2, patchDir)));
                             
+                            string hpUp = Path.Combine(patchDir, "HPUP.exe");
                             string hpSetup = Path.Combine(patchDir, "HPSetup.exe");
                             string installExe = Path.Combine(patchDir, "install.exe");
+
                             if (File.Exists(hpSetup))
                             {
                                 Process process = new Process();
                                 process.StartInfo.FileName = hpSetup;
+                                process.StartInfo.UseShellExecute = false;
+                                process.StartInfo.WorkingDirectory = patchDir;
+                                process.Start();
+                                process.WaitForExit();
+                                Thread.Sleep(50);
+                            }
+                            else if (File.Exists(hpUp))
+                            {
+                                Process process = new Process();
+                                process.StartInfo.FileName = hpUp;
                                 process.StartInfo.UseShellExecute = false;
                                 process.StartInfo.WorkingDirectory = patchDir;
                                 process.Start();
@@ -183,7 +195,7 @@ namespace HP_Driver_Installation_Fixer
                             }
                             else
                             {
-                                MessageBox.Show("Successfully patched " + patchDir + " but could not install it because HPSetup.exe or Install.exe was not found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("Successfully patched " + patchDir + " but could not install it because HPSetup.exe, HPUP.exe, or Install.exe was not found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
                         else // This will only happen if the user/system deleted something before we got here, but after we searched
