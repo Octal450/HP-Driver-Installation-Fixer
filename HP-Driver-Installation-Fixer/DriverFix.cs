@@ -158,9 +158,9 @@ namespace HP_Driver_Installation_Fixer
                             Thread.Sleep(500);
 
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 2, patchDir)));
-                            
-                            string hpUp = Path.Combine(patchDir, "HPUP.exe");
+
                             string hpSetup = Path.Combine(patchDir, "HPSetup.exe");
+                            string hpUp = Path.Combine(patchDir, "HPUP.exe");
                             string installExe = Path.Combine(patchDir, "install.exe");
 
                             if (File.Exists(hpSetup))
