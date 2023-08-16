@@ -29,12 +29,26 @@ namespace HP_Driver_Installation_Fixer
                         foreach (string subDir in subDirs)
                         {
                             string detectionCmd = Path.Combine(subDir, "detection.cmd");
+                            string drvInstallCmd = Path.Combine(subDir, "drvinstall.cmd");
                             string installBat = Path.Combine(subDir, "install.bat");
                             string installCmd = Path.Combine(subDir, "install.cmd");
 
                             if (File.Exists(detectionCmd))
                             {
                                 streamReader = new StreamReader(detectionCmd);
+                                string streamContents = streamReader.ReadToEnd();
+
+                                if (streamContents.Contains("goto unsupport_OS"))
+                                {
+                                    patchList.Add(subDir);
+                                }
+
+                                streamReader.Close();
+                                Thread.Sleep(50);
+                            }
+                            else if (File.Exists(drvInstallCmd))
+                            {
+                                streamReader = new StreamReader(drvInstallCmd);
                                 string streamContents = streamReader.ReadToEnd();
 
                                 if (streamContents.Contains("goto unsupport_OS"))
@@ -110,14 +124,16 @@ namespace HP_Driver_Installation_Fixer
                     foreach (string patchDir in patchList)
                     {
                         string detectionCmd = Path.Combine(patchDir, "detection.cmd");
+                        string drvInstallCmd = Path.Combine(patchDir, "drvinstall.cmd");
                         string installBat = Path.Combine(patchDir, "install.bat");
                         string installCmd = Path.Combine(patchDir, "install.cmd");
 
                         bool detectionCmdExists = File.Exists(detectionCmd);
+                        bool drvInstallCmdExists = File.Exists(drvInstallCmd);
                         bool installBatExists = File.Exists(installBat);
                         bool installCmdExists = File.Exists(installCmd);
 
-                        if (detectionCmdExists || installBatExists || installCmdExists)
+                        if (detectionCmdExists || drvInstallCmdExists || installBatExists || installCmdExists)
                         {
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 1, patchDir)));
 
@@ -129,9 +145,19 @@ namespace HP_Driver_Installation_Fixer
                                 Thread.Sleep(50);
 
                                 File.WriteAllText(detectionCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                                Thread.Sleep(500);
                             }
 
-                            Thread.Sleep(500);
+                            if (drvInstallCmdExists)
+                            {
+                                streamReader = new StreamReader(drvInstallCmd);
+                                string streamContents = streamReader.ReadToEnd();
+                                streamReader.Close();
+                                Thread.Sleep(50);
+
+                                File.WriteAllText(drvInstallCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                                Thread.Sleep(500);
+                            }
 
                             if (installBatExists)
                             {
@@ -141,9 +167,8 @@ namespace HP_Driver_Installation_Fixer
                                 Thread.Sleep(50);
 
                                 File.WriteAllText(installBat, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                                Thread.Sleep(500);
                             }
-
-                            Thread.Sleep(500);
 
                             if (installCmdExists)
                             {
@@ -153,9 +178,8 @@ namespace HP_Driver_Installation_Fixer
                                 Thread.Sleep(50);
 
                                 File.WriteAllText(installCmd, streamContents.Replace("goto unsupport_OS", "echo [%date%][%time%][%~dpnx0] Patched by HP Driver Installation Fixer, continuing installation >> %Logpath%"));
+                                Thread.Sleep(500);
                             }
-
-                            Thread.Sleep(500);
 
                             MainForm.mainForm.BeginInvoke((Action)(() => MainForm.mainForm.patchProgress(patchList.IndexOf(patchDir) + 1, patchList.Count, 2, patchDir)));
 
@@ -200,7 +224,7 @@ namespace HP_Driver_Installation_Fixer
                         }
                         else // This will only happen if the user/system deleted something before we got here, but after we searched
                         {
-                            MessageBox.Show("Could not patch " + patchDir + " because detection.cmd, install.bat, or install.cmd was found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Could not patch " + patchDir + " because detection.cmd, drvinstall.cmd, install.bat, or install.cmd was found\n\nClick OK to continue patching other packages", "Can't", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
 
