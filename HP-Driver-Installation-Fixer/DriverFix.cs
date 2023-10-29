@@ -46,19 +46,6 @@ namespace HP_Driver_Installation_Fixer
                                 streamReader.Close();
                                 Thread.Sleep(50);
                             }
-                            else if (File.Exists(drvInstallCmd))
-                            {
-                                streamReader = new StreamReader(drvInstallCmd);
-                                string streamContents = streamReader.ReadToEnd();
-
-                                if (streamContents.Contains("goto unsupport_OS"))
-                                {
-                                    patchList.Add(subDir);
-                                }
-
-                                streamReader.Close();
-                                Thread.Sleep(50);
-                            }
                             else if (File.Exists(installBat))
                             {
                                 streamReader = new StreamReader(installBat);
@@ -75,6 +62,19 @@ namespace HP_Driver_Installation_Fixer
                             else if (File.Exists(installCmd))
                             {
                                 streamReader = new StreamReader(installCmd);
+                                string streamContents = streamReader.ReadToEnd();
+
+                                if (streamContents.Contains("goto unsupport_OS"))
+                                {
+                                    patchList.Add(subDir);
+                                }
+
+                                streamReader.Close();
+                                Thread.Sleep(50);
+                            }
+                            else if (File.Exists(drvInstallCmd)) // Last!
+                            {
+                                streamReader = new StreamReader(drvInstallCmd);
                                 string streamContents = streamReader.ReadToEnd();
 
                                 if (streamContents.Contains("goto unsupport_OS"))
